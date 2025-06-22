@@ -1,0 +1,1183 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "SPMT API Documentation",
+        "description": "Dokumentasi API lengkap untuk SPMT - Magang Reguler PT Pelindo Multi Terminal",
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/login": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Login pengguna",
+                "operationId": "bb50c6873ea8a352cab6c4ff49edf1d2",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "user@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "password123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Login berhasil",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "access_token": {
+                                            "type": "string",
+                                            "example": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."
+                                        },
+                                        "token_type": {
+                                            "type": "string",
+                                            "example": "bearer"
+                                        },
+                                        "expires_in": {
+                                            "type": "integer",
+                                            "example": 3600
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Kredensial tidak valid"
+                    }
+                }
+            }
+        },
+        "/api/mahasiswa/profile": {
+            "get": {
+                "tags": [
+                    "Mahasiswa - Profil"
+                ],
+                "summary": "Dapatkan profil mahasiswa",
+                "operationId": "e9e1716240715fb469fcea82e71bc1a5",
+                "responses": {
+                    "200": {
+                        "description": "Data profil mahasiswa",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/StudentProfile"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/mahasiswa/educations": {
+            "get": {
+                "tags": [
+                    "Mahasiswa - Pendidikan"
+                ],
+                "summary": "Daftar riwayat pendidikan",
+                "operationId": "586ee350f43f70839e4be83d6e6560d2",
+                "responses": {
+                    "200": {
+                        "description": "Daftar pendidikan"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/mahasiswa/experiences": {
+            "get": {
+                "tags": [
+                    "Mahasiswa - Pengalaman"
+                ],
+                "summary": "Daftar pengalaman",
+                "operationId": "65daa79bd62293dc911c4be8c9b7e386",
+                "responses": {
+                    "200": {
+                        "description": "Daftar pengalaman"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/mahasiswa/awards": {
+            "get": {
+                "tags": [
+                    "Mahasiswa - Penghargaan"
+                ],
+                "summary": "Daftar penghargaan",
+                "operationId": "93c2bdf9fdb971b41ee00eda1de828bf",
+                "responses": {
+                    "200": {
+                        "description": "Daftar penghargaan"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/mahasiswa/skills": {
+            "get": {
+                "tags": [
+                    "Mahasiswa - Keterampilan"
+                ],
+                "summary": "Daftar keterampilan",
+                "operationId": "19885afdb9baeec3e4debf21fa80ae9a",
+                "responses": {
+                    "200": {
+                        "description": "Daftar keterampilan"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/internships": {
+            "get": {
+                "tags": [
+                    "Magang"
+                ],
+                "summary": "Daftar lowongan magang",
+                "operationId": "ba13c37ca3c2695ecf4e26a165a07fd0",
+                "responses": {
+                    "200": {
+                        "description": "Daftar lowongan"
+                    }
+                }
+            }
+        },
+        "/api/mahasiswa/reports": {
+            "get": {
+                "tags": [
+                    "Laporan"
+                ],
+                "summary": "Daftar laporan magang",
+                "operationId": "f8c449e321d744b771535f023631d1ea",
+                "responses": {
+                    "200": {
+                        "description": "Daftar laporan"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/applications": {
+            "get": {
+                "tags": [
+                    "Admin - Aplikasi"
+                ],
+                "summary": "Daftar aplikasi magang (Admin)",
+                "operationId": "2fa2559c2e692caa22a3e035de75645e",
+                "responses": {
+                    "200": {
+                        "description": "Daftar aplikasi",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Application"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/mahasiswa/documents": {
+            "post": {
+                "tags": [
+                    "Mahasiswa - Dokumen"
+                ],
+                "summary": "Unggah dokumen",
+                "operationId": "8dc50f0c66140c6a5f4acfb04631e2e7",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "file",
+                                    "type"
+                                ],
+                                "properties": {
+                                    "file": {
+                                        "type": "string",
+                                        "format": "binary"
+                                    },
+                                    "type": {
+                                        "type": "string",
+                                        "enum": [
+                                            "cv",
+                                            "transcript",
+                                            "certificate",
+                                            "other"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Dokumen berhasil diunggah"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/issues": {
+            "get": {
+                "tags": [
+                    "Admin - Issue"
+                ],
+                "summary": "Daftar laporan masalah",
+                "operationId": "d1afdd6759bdb665d61d2cb70995c86f",
+                "responses": {
+                    "200": {
+                        "description": "Daftar laporan masalah",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Issue"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/certificates/generate": {
+            "post": {
+                "tags": [
+                    "Admin - Sertifikat"
+                ],
+                "summary": "Generate sertifikat",
+                "operationId": "d931cb4411227f090c4a25335a7d9214",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CertificateRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Sertifikat berhasil digenerate"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/divisions": {
+            "get": {
+                "tags": [
+                    "Admin - Divisi"
+                ],
+                "summary": "Daftar divisi",
+                "operationId": "191723489119227e72004ed76cd94c82",
+                "responses": {
+                    "200": {
+                        "description": "Daftar divisi",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Division"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/dashboard/stats": {
+            "get": {
+                "tags": [
+                    "Admin - Dashboard"
+                ],
+                "summary": "Statistik dashboard admin",
+                "operationId": "0ebc11c7680cdd4946240eed561e59b4",
+                "responses": {
+                    "200": {
+                        "description": "Data statistik",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DashboardStats"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/export/students": {
+            "get": {
+                "tags": [
+                    "Admin - Ekspor"
+                ],
+                "summary": "Ekspor data mahasiswa",
+                "operationId": "13d41c032c82d01922c607675697e92b",
+                "responses": {
+                    "200": {
+                        "description": "File Excel berhasil diunduh",
+                        "content": {
+                            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {}
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/users": {
+            "get": {
+                "tags": [
+                    "Admin - Pengguna"
+                ],
+                "summary": "Daftar pengguna",
+                "operationId": "03cda06a3e6d8fd47c3eb426a31be65f",
+                "responses": {
+                    "200": {
+                        "description": "Daftar pengguna",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/User"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/mahasiswa/profile/completion": {
+            "get": {
+                "tags": [
+                    "Mahasiswa - Profil"
+                ],
+                "summary": "Status kelengkapan profil",
+                "operationId": "9f4dab5ce061414295bfdcb405c6e423",
+                "responses": {
+                    "200": {
+                        "description": "Status kelengkapan profil",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProfileCompletion"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/activity-logs": {
+            "get": {
+                "tags": [
+                    "Admin - Logs"
+                ],
+                "summary": "Daftar log aktivitas",
+                "operationId": "45710f2a56a168b5b4bf2b86a9ac0856",
+                "responses": {
+                    "200": {
+                        "description": "Daftar log aktivitas",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/ActivityLog"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/search": {
+            "get": {
+                "tags": [
+                    "Pencarian"
+                ],
+                "summary": "Pencarian global",
+                "operationId": "c4a79c57a25391cefb23c8ced4c23a49",
+                "parameters": [
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "description": "Kata kunci pencarian",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Hasil pencarian",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SearchResults"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/general/info": {
+            "get": {
+                "tags": [
+                    "Umum"
+                ],
+                "summary": "Informasi umum sistem",
+                "operationId": "b2a4549bcc9ef2117e3ab49c81caeddc",
+                "responses": {
+                    "200": {
+                        "description": "Informasi sistem",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SystemInfo"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/mahasiswa/family-members": {
+            "get": {
+                "tags": [
+                    "Keluarga"
+                ],
+                "summary": "Daftar anggota keluarga",
+                "operationId": "9666896fc3d5ac7bed6025c842bff7b4",
+                "responses": {
+                    "200": {
+                        "description": "Daftar anggota keluarga",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/FamilyMember"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Keluarga"
+                ],
+                "summary": "Tambah anggota keluarga",
+                "operationId": "bcc1edf26a90be4c61074a857edcb4a5",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/FamilyMemberRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Anggota keluarga berhasil ditambahkan"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/mahasiswa/family-info": {
+            "get": {
+                "tags": [
+                    "Keluarga"
+                ],
+                "summary": "Dapatkan informasi keluarga",
+                "operationId": "3d9d529ec62b59c63cfc0c476f279843",
+                "responses": {
+                    "200": {
+                        "description": "Informasi keluarga",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/FamilyInfo"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/settings": {
+            "get": {
+                "tags": [
+                    "Pengaturan"
+                ],
+                "summary": "Dapatkan pengaturan sistem",
+                "operationId": "327581eef9477edf5c82f9932489c943",
+                "responses": {
+                    "200": {
+                        "description": "Daftar pengaturan",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": true
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Pengaturan"
+                ],
+                "summary": "Update pengaturan sistem",
+                "operationId": "73c1a0ef2e2a70137d0ad7db67f4a917",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "additionalProperties": true
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Pengaturan berhasil diupdate"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "StudentProfile": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Nama Mahasiswa"
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "example": "mahasiswa@example.com"
+                    },
+                    "nim": {
+                        "type": "string",
+                        "example": "12345678"
+                    },
+                    "phone": {
+                        "type": "string",
+                        "example": "081234567890"
+                    },
+                    "address": {
+                        "type": "string",
+                        "example": "Alamat lengkap"
+                    }
+                },
+                "type": "object"
+            },
+            "Application": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "status": {
+                        "type": "string",
+                        "example": "pending"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "student": {
+                        "$ref": "#/components/schemas/StudentProfile"
+                    }
+                },
+                "type": "object"
+            },
+            "Issue": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "title": {
+                        "type": "string",
+                        "example": "Judul Masalah"
+                    },
+                    "description": {
+                        "type": "string",
+                        "example": "Deskripsi masalah"
+                    },
+                    "status": {
+                        "type": "string",
+                        "example": "open"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "CertificateRequest": {
+                "required": [
+                    "student_id",
+                    "internship_id",
+                    "issue_date"
+                ],
+                "properties": {
+                    "student_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "internship_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "issue_date": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "additional_notes": {
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "DashboardStats": {
+                "properties": {
+                    "total_students": {
+                        "type": "integer",
+                        "example": 150
+                    },
+                    "total_internships": {
+                        "type": "integer",
+                        "example": 25
+                    },
+                    "pending_applications": {
+                        "type": "integer",
+                        "example": 12
+                    },
+                    "active_internships": {
+                        "type": "integer",
+                        "example": 45
+                    }
+                },
+                "type": "object"
+            },
+            "ProfileCompletion": {
+                "properties": {
+                    "percentage": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 75.5
+                    },
+                    "missing_fields": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "is_complete": {
+                        "type": "boolean",
+                        "example": false
+                    }
+                },
+                "type": "object"
+            },
+            "SystemInfo": {
+                "properties": {
+                    "app_name": {
+                        "type": "string",
+                        "example": "SPMT"
+                    },
+                    "version": {
+                        "type": "string",
+                        "example": "1.0.0"
+                    },
+                    "environment": {
+                        "type": "string",
+                        "example": "production"
+                    },
+                    "maintenance_mode": {
+                        "type": "boolean",
+                        "example": false
+                    }
+                },
+                "type": "object"
+            },
+            "FamilyMember": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Nama Anggota Keluarga"
+                    },
+                    "relationship": {
+                        "type": "string",
+                        "example": "Ayah"
+                    },
+                    "phone": {
+                        "type": "string",
+                        "example": "081234567890"
+                    },
+                    "occupation": {
+                        "type": "string",
+                        "example": "PNS"
+                    }
+                },
+                "type": "object"
+            },
+            "FamilyMemberRequest": {
+                "required": [
+                    "name",
+                    "relationship"
+                ],
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "example": "Nama Lengkap"
+                    },
+                    "relationship": {
+                        "type": "string",
+                        "example": "Ayah"
+                    },
+                    "phone": {
+                        "type": "string",
+                        "example": "081234567890"
+                    },
+                    "occupation": {
+                        "type": "string",
+                        "example": "PNS"
+                    }
+                },
+                "type": "object"
+            },
+            "FamilyInfo": {
+                "properties": {
+                    "family_card_number": {
+                        "type": "string",
+                        "example": "1234567890123456"
+                    },
+                    "address": {
+                        "type": "string",
+                        "example": "Alamat lengkap keluarga"
+                    },
+                    "members_count": {
+                        "type": "integer",
+                        "example": 4
+                    }
+                },
+                "type": "object"
+            },
+            "Division": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "IT Department"
+                    },
+                    "description": {
+                        "type": "string",
+                        "example": "Divisi Teknologi Informasi"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "User": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "John Doe"
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "example": "user@example.com"
+                    },
+                    "role": {
+                        "type": "string",
+                        "example": "admin|user|student"
+                    },
+                    "email_verified_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "ActivityLog": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "log_name": {
+                        "type": "string",
+                        "example": "default"
+                    },
+                    "description": {
+                        "type": "string",
+                        "example": "User logged in"
+                    },
+                    "subject_type": {
+                        "type": "string",
+                        "example": "App\\\\Models\\\\User"
+                    },
+                    "subject_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "causer_type": {
+                        "type": "string",
+                        "example": "App\\\\Models\\\\User"
+                    },
+                    "causer_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "properties": {
+                        "type": "object",
+                        "example": {
+                            "ip": "127.0.0.1",
+                            "user_agent": "Mozilla/5.0"
+                        }
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "SearchResults": {
+                "properties": {
+                    "data": {
+                        "type": "array",
+                        "items": {
+                            "properties": {
+                                "type": {
+                                    "type": "string",
+                                    "example": "users|internships|applications"
+                                },
+                                "id": {
+                                    "type": "integer",
+                                    "example": 1
+                                },
+                                "title": {
+                                    "type": "string",
+                                    "example": "Contoh Hasil Pencarian"
+                                },
+                                "description": {
+                                    "type": "string",
+                                    "example": "Deskripsi singkat hasil pencarian"
+                                },
+                                "url": {
+                                    "type": "string",
+                                    "example": "/path/to/resource/1"
+                                }
+                            },
+                            "type": "object"
+                        }
+                    },
+                    "total": {
+                        "type": "integer",
+                        "example": 15
+                    },
+                    "per_page": {
+                        "type": "integer",
+                        "example": 10
+                    },
+                    "current_page": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "last_page": {
+                        "type": "integer",
+                        "example": 2
+                    }
+                },
+                "type": "object"
+            }
+        },
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "bearerFormat": "JWT",
+                "scheme": "bearer"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Authentication",
+            "description": "Autentikasi Pengguna"
+        },
+        {
+            "name": "Mahasiswa - Profil",
+            "description": "Manajemen Profil Mahasiswa"
+        },
+        {
+            "name": "Mahasiswa - Pendidikan",
+            "description": "Riwayat Pendidikan Mahasiswa"
+        },
+        {
+            "name": "Mahasiswa - Pengalaman",
+            "description": "Pengalaman Kerja/Organisasi"
+        },
+        {
+            "name": "Mahasiswa - Penghargaan",
+            "description": "Penghargaan Mahasiswa"
+        },
+        {
+            "name": "Mahasiswa - Keterampilan",
+            "description": "Keterampilan Mahasiswa"
+        },
+        {
+            "name": "Mahasiswa - Dokumen",
+            "description": "Dokumen Pendukung"
+        },
+        {
+            "name": "Magang",
+            "description": "Manajemen Magang"
+        },
+        {
+            "name": "Pencarian",
+            "description": "Pencarian Global"
+        },
+        {
+            "name": "Umum",
+            "description": "Endpoint Umum Sistem"
+        },
+        {
+            "name": "Keluarga",
+            "description": "Manajemen Data Keluarga"
+        },
+        {
+            "name": "Pengaturan",
+            "description": "Pengaturan Sistem"
+        },
+        {
+            "name": "Laporan",
+            "description": "Laporan Magang"
+        },
+        {
+            "name": "Admin - Aplikasi",
+            "description": "Manajemen Aplikasi (Admin)"
+        },
+        {
+            "name": "Admin - Issue",
+            "description": "Manajemen Laporan Masalah"
+        },
+        {
+            "name": "Admin - Sertifikat",
+            "description": "Manajemen Sertifikat"
+        },
+        {
+            "name": "Admin - Divisi",
+            "description": "Manajemen Divisi"
+        },
+        {
+            "name": "Admin - Dashboard",
+            "description": "Dashboard Admin"
+        },
+        {
+            "name": "Admin - Ekspor",
+            "description": "Ekspor Data"
+        },
+        {
+            "name": "Admin - Pengguna",
+            "description": "Admin - Pengguna"
+        },
+        {
+            "name": "Admin - Logs",
+            "description": "Admin - Logs"
+        }
+    ]
+}
