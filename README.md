@@ -111,5 +111,5 @@ Aplikasi ini bersifat open source di bawah lisensi [MIT](LICENSE).
 Kontribusi sangat diterima. Silakan buat Pull Request dengan perubahan yang diusulkan.
 
 ## 📧 Kontak
-Nama Anda - [mhdfahri2003@gmail.com]
+Muhammad Fahri - [mhdfahri2003@gmail.com]
 Project Link: [https://github.com/muhdfhri/SPMT](https://github.com/muhdfhri/SPMT)
