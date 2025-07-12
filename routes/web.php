@@ -67,6 +67,18 @@ Route::get('/profile', function() {
 })->name('profile');
 
 // Mahasiswa Routes
+// Test route for view debugging
+Route::get('/test-view', function() {
+    return view('mahasiswa.reports.edit', [
+        'report' => \App\Models\MonthlyReport::first(),
+        'monthNames' => [
+            1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
+            5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
+            9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
+        ]
+    ]);
+})->middleware('auth');
+
 Route::middleware(['auth', 'mahasiswa'])->prefix('mahasiswa')->name('mahasiswa.')->group(function () {
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
@@ -146,6 +158,12 @@ Route::middleware(['auth', 'mahasiswa'])->prefix('mahasiswa')->name('mahasiswa.'
         Route::get('/reports/create', [ReportController::class, 'create'])->name('reports.create');
         Route::post('/reports', [ReportController::class, 'store'])->name('reports.store');
         Route::get('/reports/{report}', [ReportController::class, 'show'])->name('reports.show');
+        Route::get('/reports/{report}/edit', [ReportController::class, 'edit'])->name('reports.edit');
+        Route::put('/reports/{report}', [ReportController::class, 'update'])->name('reports.update');
+        
+        // Route untuk menghapus lampiran
+        Route::delete('/reports/attachments/{attachment}', [ReportController::class, 'destroyAttachment'])
+            ->name('reports.attachments.destroy');
         
         // Certificate Routes
         Route::get('/certificates', [\App\Http\Controllers\Mahasiswa\CertificateController::class, 'index'])->name('certificates.index');

@@ -271,24 +271,62 @@ class CertificateController extends Controller
      */
     public function revoke(Request $request, Certificate $certificate)
     {
-        $request->validate([
-            'revoked_reason' => 'required|string|max:500'
-        ]);
-        
-        $certificate->update([
-            'status' => Certificate::STATUS_REVOKED,
-            'revoked_at' => now(),
-            'revoked_reason' => $request->revoked_reason
-        ]);
-        
-        activity()
-            ->causedBy(auth()->user())
-            ->performedOn($certificate)
-            ->withProperties([
-                'reason' => $request->revoked_reason
-            ])
-            ->log('Mencabut sertifikat');
+        try {
+            $validated = $request->validate([
+                'revoked_reason' => 'required|string|min:10|max:500'
+            ], [
+                'revoked_reason.required' => 'Alasan pencabutan wajib diisi',
+                'revoked_reason.min' => 'Alasan pencabutan minimal :min karakter',
+                'revoked_reason.max' => 'Alasan pencabutan maksimal :max karakter'
+            ]);
             
-        return redirect()->back()->with('success', 'Sertifikat berhasil dicabut.');
+            // Pastikan sertifikat belum dicabut sebelumnya
+            if ($certificate->status === Certificate::STATUS_REVOKED) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Sertifikat ini sudah dicabut sebelumnya.'
+                ], 422);
+            }
+            
+            // Update status sertifikat
+            $certificate->update([
+                'status' => Certificate::STATUS_REVOKED,
+                'revoked_at' => now(),
+                'revoked_by' => auth()->id(),
+                'revoked_reason' => $validated['revoked_reason']
+            ]);
+            
+            // Log activity
+            activity()
+                ->causedBy(auth()->user())
+                ->performedOn($certificate)
+                ->withProperties([
+                    'reason' => $validated['revoked_reason']
+                ])
+                ->log('Mencabut sertifikat');
+                
+            return response()->json([
+                'success' => true,
+                'message' => 'Sertifikat berhasil dicabut.'
+            ]);
+            
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validasi gagal',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            \Log::error('Gagal mencabut sertifikat: ' . $e->getMessage(), [
+                'certificate_id' => $certificate->id,
+                'user_id' => auth()->id(),
+                'exception' => $e
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan saat mencabut sertifikat: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }

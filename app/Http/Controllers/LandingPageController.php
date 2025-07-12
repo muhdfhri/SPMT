@@ -52,7 +52,7 @@ class LandingPageController extends Controller
         // Get the results with applications count
         $featuredInternships = $query->withCount('applications')
             ->latest()
-            ->paginate(6);
+            ->paginate(3);
         
         // Add flash message if no results found
         if ($featuredInternships->isEmpty() && $hasFilters) {

@@ -53,8 +53,8 @@
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                                     Tanggal Terbit
                                 </th>
-                                <th scope="col" class="relative px-6 py-3">
-                                    <span class="sr-only">Aksi</span>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                    Aksi
                                 </th>
                             </tr>
                         </thead>
@@ -72,8 +72,10 @@
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                                     {{ $certificate->issue_date->format('d M Y') }}
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                    <a href="{{ route('mahasiswa.certificates.download', $certificate) }}" class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 mr-3">
+                                <td class="px-6 py-4 whitespace-nowrap text-left text-sm font-medium">
+                                    <a href="#" 
+                                       onclick="handleCertificateDownload(event, '{{ route('mahasiswa.certificates.download', $certificate) }}')" 
+                                       class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 mr-3">
                                         <svg class="w-5 h-5 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
                                         </svg>
@@ -95,4 +97,112 @@
         </div>
     </div>
 </div>
+@push('scripts')
+<script>
+    // Function to handle certificate download
+    async function handleCertificateDownload(event, url) {
+        event.preventDefault();
+        
+        try {
+            const response = await fetch(url, {
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                }
+            });
+            
+            // If response is a file download
+            if (response.headers.get('content-type')?.includes('application/pdf')) {
+                // Create a temporary link to trigger download
+                const blob = await response.blob();
+                const downloadUrl = window.URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = downloadUrl;
+                link.setAttribute('download', 'sertifikat.pdf');
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+                window.URL.revokeObjectURL(downloadUrl);
+                return;
+            }
+            
+            const data = await response.json();
+            
+            // If certificate is revoked, show modal with reason
+            if (data.status === 'revoked') {
+                showRevokedCertificateModal(data);
+            } else {
+                // For other errors
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: data.message || 'Terjadi kesalahan saat mengunduh sertifikat',
+                    confirmButtonText: 'Tutup'
+                });
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Terjadi kesalahan. Silakan coba lagi nanti.',
+                confirmButtonText: 'Tutup'
+            });
+        }
+    }
+    
+    // Function to show revoked certificate modal
+    function showRevokedCertificateModal(data) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Sertifikat Telah Dicabut',
+            html: `
+                <div class="text-left space-y-3">
+                    <p class="mb-2">${data.message}</p>
+                    <div class="bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-400 p-4">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <svg class="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                            <div class="ml-3">
+                                <h3 class="text-sm font-medium text-yellow-800 dark:text-yellow-200">Alasan Pencabutan</h3>
+                                <div class="mt-1 text-sm text-yellow-700 dark:text-yellow-300">
+                                    <p>${data.revoked_reason || 'Tidak ada alasan yang dicantumkan'}</p>
+                                </div>
+                                <div class="mt-2 text-xs text-yellow-600 dark:text-yellow-400">
+                                    <p>Dicabut pada: ${data.revoked_at || 'Tanggal tidak tersedia'}</p>
+                                    <p>Oleh: ${data.revoked_by || 'Administrator'}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `,
+            confirmButtonText: 'Mengerti',
+            confirmButtonColor: '#3B82F6',
+            customClass: {
+                confirmButton: 'px-4 py-2 text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500'
+            }
+        });
+    }
+</script>
+@endpush
+
+@push('styles')
+<style>
+    .swal2-popup {
+        font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    }
+    .swal2-title {
+        @apply text-lg font-semibold text-gray-900 dark:text-white;
+    }
+    .swal2-html-container {
+        @apply text-sm text-gray-600 dark:text-gray-300;
+    }
+</style>
+@endpush
+
 @endsection

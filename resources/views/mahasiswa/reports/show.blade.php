@@ -80,21 +80,29 @@
 
                     <!-- Feedback -->
                     @if($report->feedback)
-                    <div class="bg-blue-50 dark:bg-blue-900/30 border-l-4 border-blue-400 p-4 rounded-md">
+                    <div class="{{ $report->status === 'rejected' ? 'bg-red-50 dark:bg-red-900/20 border-red-400' : 'bg-blue-50 dark:bg-blue-900/30 border-blue-400' }} border-l-4 p-4 rounded-md">
                         <div class="flex">
                             <div class="flex-shrink-0">
+                                @if($report->status === 'rejected')
+                                <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 0L6 8.586 4.707 7.293a1 1 0 00-1.414 1.414L4.586 10l-1.293 1.293a1 1 0 101.414 1.414L6 11.414l1.293 1.293a1 1 0 001.414-1.414L7.414 10l1.293-1.293a1 1 0 000-1.414z" clip-rule="evenodd" />
+                                </svg>
+                                @else
                                 <svg class="h-5 w-5 text-blue-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                                     <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h2a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
                                 </svg>
+                                @endif
                             </div>
                             <div class="ml-3">
-                                <h3 class="text-sm font-medium text-blue-800 dark:text-blue-200">Catatan Pembimbing</h3>
-                                <div class="mt-2 text-sm text-blue-700 dark:text-blue-300">
+                                <h3 class="text-sm font-medium {{ $report->status === 'rejected' ? 'text-red-800 dark:text-red-200' : 'text-blue-800 dark:text-blue-200' }}">
+                                    {{ $report->status === 'rejected' ? 'Alasan Penolakan' : 'Catatan Pembimbing' }}
+                                </h3>
+                                <div class="mt-2 text-sm {{ $report->status === 'rejected' ? 'text-red-700 dark:text-red-300' : 'text-blue-700 dark:text-blue-300' }}">
                                     <p>{!! nl2br(e($report->feedback)) !!}</p>
                                 </div>
                                 @if($report->reviewed_at)
-                                    <div class="mt-2 text-xs text-blue-600 dark:text-blue-400">
-                                        Diberikan pada: {{ $report->reviewed_at->format('d F Y H:i') }}
+                                    <div class="mt-2 text-xs {{ $report->status === 'rejected' ? 'text-red-600 dark:text-red-400' : 'text-blue-600 dark:text-blue-400' }}">
+                                        Direview pada: {{ \Carbon\Carbon::parse($report->reviewed_at)->locale('id_ID')->isoFormat('D MMMM YYYY') }}
                                     </div>
                                 @endif
                             </div>
@@ -115,13 +123,13 @@
                                 <div>
                                     <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Dibuat pada</dt>
                                     <dd class="mt-1 text-sm text-gray-900 dark:text-gray-200">
-                                        {{ $report->created_at->format('d F Y H:i') }}
+                                        {{ \Carbon\Carbon::parse($report->created_at)->locale('id_ID')->isoFormat('D MMMM YYYY') }}
                                     </dd>
                                 </div>
                                 <div>
                                     <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Terakhir diperbarui</dt>
                                     <dd class="mt-1 text-sm text-gray-900 dark:text-gray-200">
-                                        {{ $report->updated_at->format('d F Y H:i') }}
+                                        {{ \Carbon\Carbon::parse($report->updated_at)->locale('id_ID')->isoFormat('D MMMM YYYY') }}
                                     </dd>
                                 </div>
                                 @if($report->reviewer)
@@ -198,7 +206,7 @@
                                         </div>
                                         <div>
                                             <a href="{{ Storage::url($attachment->file_path) }}" target="_blank" class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-blue-700 bg-blue-100 hover:bg-blue-200 dark:bg-blue-900 dark:text-blue-200 dark:hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                                                Unduh
+                                                Preview
                                             </a>
                                         </div>
                                     </div>
@@ -212,33 +220,51 @@
             </div>
 
             <!-- Actions -->
-            <div class="mt-8 pt-5 border-t border-gray-200 dark:border-gray-700 flex justify-between">
-                <a href="{{ route('mahasiswa.reports.index') }}" class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                    <svg class="-ml-1 mr-2 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
-                    </svg>
-                    Kembali ke Daftar
-                </a>
-                @if($report->status === 'draft')
-                <div class="space-x-3">
-                    <a href="{{ route('mahasiswa.reports.edit', $report->id) }}" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-yellow-600 hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500">
-                        <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                            <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+            <div class="mt-8 pt-5 border-t border-gray-200 dark:border-gray-700">
+                <div class="flex flex-col space-y-3 sm:flex-row sm:justify-between sm:space-y-0 sm:space-x-3">
+                    <!-- Kembali ke Daftar Button -->
+                    <a href="{{ route('mahasiswa.reports.index') }}" class="w-full sm:w-auto inline-flex justify-center items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        <svg class="-ml-1 mr-2 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
                         </svg>
-                        Edit
+                        Kembali ke Daftar
                     </a>
-                    <form action="{{ route('mahasiswa.reports.destroy', $report->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Apakah Anda yakin ingin menghapus laporan ini?')">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
-                            <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
-                            </svg>
-                            Hapus
-                        </button>
-                    </form>
+                    
+                    <!-- Action Buttons -->
+                    <div class="flex flex-col space-y-3 sm:flex-row sm:space-y-0 sm:space-x-3">
+                        @if($report->status === 'rejected' && $report->feedback)
+                            <div class="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-red-700 bg-red-100 dark:bg-red-900 dark:text-red-200 rounded-md">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                Perlu Revisi
+                            </div>
+                        @endif
+                        
+                        @if($report->status === 'draft' || $report->status === 'rejected')
+                            <a href="{{ route('mahasiswa.reports.edit', $report) }}" 
+                               class="w-full sm:w-auto inline-flex justify-center items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white {{ $report->status === 'rejected' ? 'bg-red-600 hover:bg-red-700 focus:ring-red-500' : 'bg-yellow-600 hover:bg-yellow-700 focus:ring-yellow-500' }} focus:outline-none focus:ring-2 focus:ring-offset-2">
+                                <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                    <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                                </svg>
+                                {{ $report->status === 'rejected' ? 'Revisi Laporan' : 'Edit' }}
+                            </a>
+                        @endif
+                        
+                        @if($report->status === 'draft')
+                            <form action="{{ route('mahasiswa.reports.destroy', $report->id) }}" method="POST" class="w-full sm:w-auto" onsubmit="return confirm('Apakah Anda yakin ingin menghapus laporan ini?')">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                                    <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+                                    </svg>
+                                    Hapus
+                                </button>
+                            </form>
+                        @endif
+                    </div>
                 </div>
-                @endif
             </div>
         </div>
     </div>

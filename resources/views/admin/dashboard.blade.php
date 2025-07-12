@@ -94,7 +94,7 @@
                     </div>
                 </div>
                 <div class="mt-4 border-t border-gray-100 dark:border-gray-700 pt-4">
-                    <a href="{{ route('admin.students.index') }}" class="text-sm text-green-600 dark:text-green-400 hover:underline flex items-center">
+                    <a href="{{ route('admin.students.active-internships') }}" class="text-sm text-green-600 dark:text-green-400 hover:underline flex items-center">
                         Lihat semua mahasiswa
                         <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>

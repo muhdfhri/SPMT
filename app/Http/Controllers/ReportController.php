@@ -21,6 +21,45 @@ class ReportController extends Controller
     {
         $this->middleware(['auth', 'mahasiswa']);
     }
+    
+    /**
+     * Menghapus lampiran laporan
+     *
+     * @param  \App\Models\MonthlyReportAttachment  $attachment
+     * @return \Illuminate\Http\Response
+     */
+    public function destroyAttachment(MonthlyReportAttachment $attachment)
+    {
+        try {
+            // Pastikan lampiran milik laporan yang dimiliki oleh user yang login
+            if ($attachment->report->user_id !== Auth::id()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Anda tidak memiliki izin untuk menghapus lampiran ini.'
+                ], 403);
+            }
+            
+            // Hapus file dari storage
+            Storage::disk('public')->delete($attachment->file_path);
+            
+            // Hapus record dari database
+            $attachment->delete();
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Lampiran berhasil dihapus.'
+            ]);
+            
+        } catch (\Exception $e) {
+            \Log::error('Gagal menghapus lampiran: ' . $e->getMessage());
+            \Log::error($e->getTraceAsString());
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan saat menghapus lampiran.'
+            ], 500);
+        }
+    }
 
     /**
      * Show the list of reports.
@@ -185,7 +224,7 @@ class ReportController extends Controller
                 'tasks' => $request->tasks,
                 'achievements' => $request->achievements,
                 'challenges' => $request->challenges,
-                'status' => $request->has('draft') ? 'draft' : 'submitted',
+                'status' => MonthlyReport::STATUS_SUBMITTED,
             ]);
             
             $saved = $report->save();
@@ -231,8 +270,6 @@ class ReportController extends Controller
         }
     }
 
-    
-
     /**
      * Show a report.
      *
@@ -259,5 +296,171 @@ class ReportController extends Controller
             'report' => $report,
             'monthNames' => $monthNames
         ]);
+    }
+    
+    /**
+     * Show the form for editing the specified report.
+     *
+     * @param  \App\Models\MonthlyReport  $report
+     * @return \Illuminate\Http\Response
+     */
+    public function edit(MonthlyReport $report)
+    {
+        // Pastikan laporan milik user yang login
+        if ($report->user_id !== Auth::id()) {
+            abort(403, 'Unauthorized action.');
+        }
+        
+        // Pastikan status laporan bisa diedit (draft atau rejected)
+        if (!in_array($report->status, ['draft', 'rejected'])) {
+            return redirect()->route('mahasiswa.reports.show', $report)
+                ->with('error', 'Laporan tidak dapat diedit karena status saat ini: ' . $report->status);
+        }
+        
+        // Dapatkan data magang yang aktif
+        $user = Auth::user();
+        $application = DB::table('applications')
+            ->join('internships', 'applications.internship_id', '=', 'internships.id')
+            ->where('applications.id', $report->application_id)
+            ->where('applications.user_id', $user->id)
+            ->select('internships.start_date', 'internships.end_date')
+            ->first();
+            
+        if (!$application) {
+            return redirect()->route('mahasiswa.dashboard')
+                ->with('error', 'Data magang tidak ditemukan.');
+        }
+        
+        $monthNames = [
+            1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
+            5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
+            9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
+        ];
+        
+        return view('mahasiswa.reports.edit', compact('report', 'monthNames'));
+    }
+    
+    /**
+     * Update the specified report in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Models\MonthlyReport  $report
+     * @return \Illuminate\Http\Response
+     */
+    public function update(Request $request, MonthlyReport $report)
+    {
+        // Log request data
+        \Log::info('Memperbarui laporan:', [
+            'report_id' => $report->id,
+            'user_id' => Auth::id()
+        ]);
+
+        // Pastikan laporan milik user yang login
+        if ($report->user_id !== Auth::id()) {
+            return back()->with('error', 'Anda tidak memiliki izin untuk memperbarui laporan ini.');
+        }
+        
+        // Pastikan status laporan bisa diedit (draft atau rejected)
+        if (!in_array($report->status, ['draft', 'rejected'])) {
+            return back()->with('error', 'Laporan tidak dapat diperbarui karena status saat ini: ' . $report->status);
+        }
+        
+        // Validasi input dengan ketentuan yang lebih ketat
+        $validated = $request->validate([
+            'tasks' => [
+                'required',
+                'string',
+                'min:10',
+                'regex:/^[^\s].*[^\s].*$/' // Minimal 2 kata
+            ],
+            'achievements' => [
+                'required',
+                'string',
+                'min:10',
+                'regex:/^[^\s].*[^\s].*$/' // Minimal 2 kata
+            ],
+            'challenges' => [
+                'required',
+                'string',
+                'min:10',
+                'regex:/^[^\s].*[^\s].*$/' // Minimal 2 kata
+            ],
+            'attachments.*' => 'nullable|file|max:5120|mimes:jpg,jpeg,png,pdf,doc,docx',
+        ], [
+            'tasks.required' => 'Tugas yang dikerjakan wajib diisi',
+            'tasks.min' => 'Tugas yang dikerjakan minimal 10 karakter',
+            'tasks.regex' => 'Tugas harus terdiri dari minimal 2 kata',
+            'achievements.required' => 'Pencapaian wajib diisi',
+            'achievements.min' => 'Pencapaian minimal 10 karakter',
+            'achievements.regex' => 'Pencapaian harus terdiri dari minimal 2 kata',
+            'challenges.required' => 'Tantangan & solusi wajib diisi',
+            'challenges.min' => 'Tantangan & solusi minimal 10 karakter',
+            'challenges.regex' => 'Tantangan & solusi harus terdiri dari minimal 2 kata',
+            'attachments.*.max' => 'Ukuran file lampiran maksimal 5MB',
+            'attachments.*.mimes' => 'Format file lampiran harus jpg, jpeg, png, pdf, doc, atau docx',
+            'delete_attachments' => 'nullable|array',
+            'delete_attachments.*' => 'exists:monthly_report_attachments,id'
+        ]);
+        
+        DB::beginTransaction();
+        
+        try {
+            // Update field yang diperlukan
+            $report->update([
+                'tasks' => trim(stripslashes($request->tasks)),
+                'achievements' => trim(stripslashes($request->achievements)),
+                'challenges' => trim(stripslashes($request->challenges)),
+                'status' => 'submitted',
+                'reviewed_at' => null,
+                'reviewed_by' => null,
+                'feedback' => null,
+                'updated_at' => now()
+            ]);
+            
+            // Handle penghapusan lampiran yang dipilih
+            if ($request->has('delete_attachments')) {
+                foreach ($request->delete_attachments as $attachmentId) {
+                    $attachment = MonthlyReportAttachment::find($attachmentId);
+                    // Pastikan attachment milik laporan yang sedang diedit
+                    if ($attachment && $attachment->monthly_report_id === $report->id) {
+                        // Hapus file dari storage
+                        Storage::disk('public')->delete($attachment->file_path);
+                        // Hapus record dari database
+                        $attachment->delete();
+                    }
+                }
+            }
+            
+            // Handle upload lampiran baru
+            if ($request->hasFile('attachments')) {
+                foreach ($request->file('attachments') as $file) {
+                    if ($file->isValid()) {
+                        $path = $file->store('monthly_reports/' . $report->id, 'public');
+                        
+                        $report->attachments()->create([
+                            'original_filename' => $file->getClientOriginalName(),
+                            'file_path' => $path,
+                            'file_size' => $file->getSize(),
+                            'mime_type' => $file->getMimeType(),
+                        ]);
+                    }
+                }
+            }
+            
+            DB::commit();
+            
+            return redirect()
+                ->route('mahasiswa.reports.show', $report)
+                ->with('success', 'Laporan berhasil diperbarui dan dikirim untuk ditinjau.');
+                
+        } catch (\Exception $e) {
+            DB::rollBack();
+            \Log::error('Gagal memperbarui laporan: ' . $e->getMessage());
+            \Log::error($e->getTraceAsString());
+            
+            return back()
+                ->with('error', 'Terjadi kesalahan saat memperbarui laporan. Silakan coba lagi.')
+                ->withInput();
+        }
     }
 }

@@ -89,31 +89,45 @@
                 </a>
             </div>
 
-            <!-- Certificate Card with Hover Effect -->
-            <div class="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-gray-700 dark:to-gray-800 rounded-lg p-4 transform transition-all duration-300 hover:scale-105 hover:shadow-lg">
+             <!-- Certificate Card with Hover Effect -->
+             <div class="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-gray-700 dark:to-gray-800 rounded-lg p-4 transform transition-all duration-300 hover:scale-105 hover:shadow-lg">
                 <div class="flex items-center mb-4">
-                    <div class="rounded-full p-3 mr-3 shadow-md {{ $certificates->count() > 0 ? 'bg-green-500' : 'bg-gray-400' }}" style="background: linear-gradient(to right, {{ $certificates->count() > 0 ? '#10B981' : '#9CA3AF' }}, {{ $certificates->count() > 0 ? '#059669' : '#6B7280' }});">
+                    @php
+                        $hasCertificates = $certificates->count() > 0;
+                        $isRevoked = $hasCertificates && $certificates->first()->status === \App\Models\Certificate::STATUS_REVOKED;
+                        $bgClass = $isRevoked ? 'bg-red-500' : ($hasCertificates ? 'bg-green-500' : 'bg-gray-400');
+                        $gradientFrom = $isRevoked ? '#EF4444' : ($hasCertificates ? '#10B981' : '#9CA3AF');
+                        $gradientTo = $isRevoked ? '#DC2626' : ($hasCertificates ? '#059669' : '#6B7280');
+                        $icon = $isRevoked ? 'M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z' : 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z';
+                    @endphp
+                    <div class="rounded-full p-3 mr-3 shadow-md {{ $bgClass }}" style="background: linear-gradient(to right, {{ $gradientFrom }}, {{ $gradientTo }});">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $icon }}" />
                         </svg>
                     </div>
                     <div>
                         <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Sertifikat Magang</h2>
-                        @if($certificates->count() > 0)
-                            <p class="text-sm text-green-600 dark:text-green-400">
-                                {{ $certificates->count() }} sertifikat tersedia
+                        @if($hasCertificates)
+                            <p class="text-sm {{ $isRevoked ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400' }}">
+                                @if($isRevoked)
+                                    Dicabut
+                                @else
+                                    {{ $certificates->count() }} sertifikat tersedia
+                                @endif
                             </p>
                         @endif
                     </div>
                 </div>
                 
-                @if($certificates->count() > 0)
+                @if($hasCertificates)
                     @php
                         $latestCert = $certificates->first();
                         $issueDate = \Carbon\Carbon::parse($latestCert->issue_date)->translatedFormat('d F Y');
+                        $revokedDate = $latestCert->revoked_at ? \Carbon\Carbon::parse($latestCert->revoked_at)->translatedFormat('d F Y') : null;
                     @endphp
+                    
                     <p class="text-gray-600 dark:text-gray-400 mb-2">
-                        <span class="font-medium">Terakhir diterbitkan:</span> {{ $issueDate }}
+                        <span class="font-medium">Diterbitkan:</span> {{ $issueDate }}
                     </p>
                     <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">
                         No. Sertifikat: {{ $latestCert->certificate_number }}

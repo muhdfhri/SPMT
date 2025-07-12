@@ -120,7 +120,7 @@
                 <div class="px-6 py-5">
                     <div class="space-y-4">
                         <div>
-                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Judul Magang</p>
+                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Posisi Magang</p>
                             <p class="mt-1 text-sm text-gray-900 dark:text-white">{{ $certificate->internship->title ?? '-' }}</p>
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -197,44 +197,76 @@
 
 <!-- Revoke Certificate Modal -->
 <div id="revokeModal" class="fixed inset-0 z-50 hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-    <div class="flex min-h-screen items-center justify-center px-4 py-4 text-center sm:block sm:p-0">
-        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" onclick="closeRevokeModal()"></div>
-        <span class="hidden sm:inline-block sm:h-screen sm:align-middle" aria-hidden="true">&#8203;</span>
-        <div class="inline-block w-full transform overflow-hidden rounded-lg bg-white px-4 pt-5 pb-4 text-left align-bottom shadow-xl transition-all dark:bg-gray-800 sm:my-8 sm:max-w-lg sm:p-6 sm:align-middle">
-            <div class="sm:flex sm:items-start">
-                <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 dark:bg-red-900 sm:mx-0 sm:h-10 sm:w-10">
-                    <svg class="h-6 w-6 text-red-600 dark:text-red-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
+        <!-- Overlay -->
+        <div class="fixed inset-0 bg-gray-500/75 transition-opacity" aria-hidden="true" onclick="closeRevokeModal()"></div>
+        
+        <!-- Modal Container -->
+        <div class="relative w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left shadow-xl transition-all dark:bg-gray-800 sm:my-8">
+            <!-- Header -->
+            <div class="flex items-start">
+                <div class="flex-shrink-0 flex items-center justify-center h-10 w-10 rounded-full bg-red-100 dark:bg-red-900/50">
+                    <svg class="h-6 w-6 text-red-600 dark:text-red-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                     </svg>
                 </div>
-                <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                    <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white" id="modal-title">
+                <div class="ml-4">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
                         Cabut Sertifikat
                     </h3>
-                    <div class="mt-2">
-                        <p class="text-sm text-gray-500 dark:text-gray-400">
-                            Apakah Anda yakin ingin mencabut sertifikat ini? Tindakan ini tidak dapat dibatalkan.
-                        </p>
-                    </div>
-                    <div class="mt-4">
-                        <label for="revoked_reason" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Alasan Pencabutan</label>
-                        <textarea id="revoked_reason" name="revoked_reason" rows="3" class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-700 dark:text-white" placeholder="Masukkan alasan pencabutan" required></textarea>
-                    </div>
+                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                        Apakah Anda yakin ingin mencabut sertifikat ini? Tindakan ini tidak dapat dibatalkan.
+                    </p>
                 </div>
             </div>
-            <div class="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
-                <form id="revokeForm" method="POST" onsubmit="return handleRevokeSubmit(event)">
-                    @csrf
-                    @method('POST')
-                    <div class="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3 sm:grid-flow-row-dense">
-                        <button type="submit" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:col-start-2 sm:text-sm">
-                            Ya, Cabut Sertifikat
-                        </button>
-                        <button type="button" onclick="closeRevokeModal()" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 dark:border-gray-600 shadow-sm px-4 py-2 bg-white dark:bg-gray-700 text-base font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-gray-900 sm:mt-0 sm:col-start-1 sm:text-sm">
+
+            <!-- Form -->
+            <form id="revokeForm" method="POST" action="{{ route('admin.certificates.revoke', $certificate) }}" onsubmit="return handleRevokeSubmit(event)" class="mt-6">
+                @csrf
+                @method('POST')
+                
+                <div class="space-y-4">
+                    <div>
+                        <label for="revoked_reason" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                            Alasan Pencabutan <span class="text-red-500">*</span>
+                        </label>
+                        <textarea 
+                            id="revoked_reason" 
+                            name="revoked_reason" 
+                            rows="4" 
+                            class="block w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm text-gray-900 shadow-sm placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
+                            required
+                            minlength="10"
+                            maxlength="500"
+                            placeholder="Masukkan alasan pencabutan sertifikat (minimal 10 karakter)"
+                        ></textarea>
+                        <p class="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
+                            Minimal 10 karakter, maksimal 500 karakter
+                        </p>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="mt-6 flex justify-end space-x-3">
+                        <button 
+                            type="button" 
+                            onclick="closeRevokeModal()" 
+                            class="rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 shadow-sm transition hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+                        >
                             Batal
                         </button>
+                        <button 
+                            type="submit" 
+                            class="inline-flex items-center justify-center rounded-lg border border-transparent bg-red-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                        >
+                            <span class="button-text">Cabut Sertifikat</span>
+                            <svg class="hidden w-4 h-4 ml-2 -mr-1 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                        </button>
                     </div>
-                </form>
+                </div>
+            </form>
             </div>
         </div>
     </div>
@@ -268,52 +300,67 @@
     }
     
     async function handleRevokeSubmit(event) {
-        event.preventDefault();
+    event.preventDefault();
+    
+    const form = event.target;
+    const formData = new FormData(form);
+    const url = form.action;
+    const submitButton = form.querySelector('button[type="submit"]');
+    const buttonText = submitButton.querySelector('.button-text');
+    const originalButtonText = buttonText.textContent;
+    const spinner = submitButton.querySelector('svg');
+    
+    try {
+        // Show loading state
+        submitButton.disabled = true;
+        buttonText.textContent = 'Memproses...';
+        spinner.classList.remove('hidden');
         
-        const form = event.target;
-        const formData = new FormData(form);
-        const url = form.action;
-        const submitButton = form.querySelector('button[type="submit"]');
-        const originalButtonText = submitButton.innerHTML;
-        
-        try {
-            // Show loading state
-            submitButton.disabled = true;
-            submitButton.innerHTML = '<svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Memproses...';
-            
-            const response = await fetch(url, {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    revoked_reason: document.getElementById('revoked_reason').value
-                })
-            });
-            
-            const data = await response.json();
-            
-            if (!response.ok) {
-                throw new Error(data.message || 'Terjadi kesalahan saat mencabut sertifikat');
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: formData
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            if (response.status === 422 && data.errors) {
+                // Handle validation errors
+                const errorMessages = Object.values(data.errors).flat().join('\n');
+                throw new Error(errorMessages);
             }
-            
-            // Show success message
-            alert('Sertifikat berhasil dicabut');
-            // Reload the page to reflect changes
-            window.location.reload();
-            
-        } catch (error) {
-            console.error('Error:', error);
-            alert(error.message || 'Terjadi kesalahan. Silakan coba lagi.');
-        } finally {
-            submitButton.disabled = false;
-            submitButton.innerHTML = originalButtonText;
+            throw new Error(data.message || 'Terjadi kesalahan saat mencabut sertifikat');
         }
+
+        // Show success message with SweetAlert2
+        await Swal.fire({
+            title: 'Berhasil!',
+            text: data.message || 'Sertifikat berhasil dicabut',
+            icon: 'success',
+            confirmButtonText: 'OK',
+            customClass: {
+                confirmButton: 'bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2'
+            }
+        });
+        // Reload the page to reflect changes
+        window.location.reload();
         
-        return false;
+    } catch (error) {
+        console.error('Error:', error);
+        alert(error.message || 'Terjadi kesalahan. Silakan coba lagi.');
+    } finally {
+        submitButton.disabled = false;
+        buttonText.textContent = originalButtonText;
+        spinner.classList.add('hidden');
     }
+    
+    return false;
+}
     
     function closeRevokeModal() {
         const modal = document.getElementById('revokeModal');
@@ -336,11 +383,11 @@
         if (event.target === modal) {
             closeRevokeModal();
         }
-    }
+    };
 
     // Handle form submission
     document.getElementById('revokeForm').addEventListener('submit', function(e) {
-        const reason = document.getElementById('revocation_reason').value;
+        const reason = document.getElementById('revoked_reason').value;
         document.getElementById('revocation_reason_input').value = reason;
     });
 </script>

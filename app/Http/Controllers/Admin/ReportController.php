@@ -9,7 +9,9 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
+
 
 class ReportController extends Controller
 {
@@ -73,6 +75,8 @@ class ReportController extends Controller
         return view('admin.reports.index', compact('users'));
     }
 
+
+    
     /**
      * Store a newly created resource in storage.
      */
@@ -126,11 +130,20 @@ class ReportController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(MonthlyReport $report, Request $request)
+    public function show($id, Request $request)
     {
+        // Temukan report berdasarkan ID
+        $report = MonthlyReport::with(['user.studentProfile', 'application.internship'])
+            ->findOrFail($id);
         try {
+            // Pastikan data yang diperlukan ada
+            if (!$report->user || !$report->application) {
+                return redirect()->route('admin.reports.index')
+                    ->with('error', 'Data magang tidak ditemukan untuk laporan ini.');
+            }
+
             // Load necessary relationships
-            $report->load(['user.studentProfile', 'attachments', 'application.internship']);
+            $report->load(['attachments', 'user.studentProfile']);
             
             // Check if application exists
             if (!$report->application_id) {
@@ -202,12 +215,36 @@ class ReportController extends Controller
             });
             
             // Jika tidak ada laporan untuk bulan dan tahun yang diminta, gunakan laporan yang ada
-            if (!$currentReport) {
-                $currentReport = $report;
+            // Set current month and year for view
+            $currentMonth = $month;
+            $currentYear = $year;
+            
+            // Check if report exists for the current month and year
+            $hasReport = $currentReport !== null;
+            
+            // If no report found for the requested month, create a temporary report object
+            // to avoid errors in the view
+            if (!$hasReport) {
+                $currentReport = new MonthlyReport([
+                    'month' => $month,
+                    'year' => $year,
+                    'tasks' => [],
+                    'achievements' => [],
+                    'challenges' => [],
+                    'status' => 'belum_terisi',
+                    'user_id' => $report->user_id,
+                    'application_id' => $report->application_id
+                ]);
             }
             
             // Load relasi untuk laporan yang akan ditampilkan
             $currentReport->load(['attachments']);
+            
+            // Nama-nama bulan dalam bahasa Indonesia
+            $monthNames = [
+                1 => 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+                'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+            ];
             
             return view('admin.reports.show', [
                 'report' => $currentReport,
@@ -217,7 +254,8 @@ class ReportController extends Controller
                 'currentYear' => (int)$year,
                 'hasReport' => $currentReport->exists,
                 'startDate' => $startDate,
-                'endDate' => $endDate
+                'endDate' => $endDate,
+                'monthNames' => $monthNames
             ]);
         
     } catch (\Exception $e) {
@@ -233,7 +271,7 @@ class ReportController extends Controller
     public function update(Request $request, MonthlyReport $report)
     {
         $validated = $request->validate([
-            'status' => 'required|in:pending,approved,rejected',
+            'status' => 'required|in:' . implode(',', array_keys(MonthlyReport::$statuses)),
             'feedback' => 'nullable|string|max:1000',
         ]);
         

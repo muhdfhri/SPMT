@@ -53,6 +53,17 @@ class CertificateController extends Controller
         if ($certificate->user_id !== Auth::id()) {
             abort(403, 'Anda tidak memiliki izin untuk mengunduh sertifikat ini.');
         }
+        
+        // Cek status sertifikat
+        if ($certificate->status === 'revoked') {
+            return response()->json([
+                'status' => 'revoked',
+                'message' => 'Sertifikat ini telah dicabut dan tidak dapat diunduh.',
+                'revoked_at' => $certificate->revoked_at ? $certificate->revoked_at->format('d M Y') : null,
+                'revoked_reason' => $certificate->revoked_reason ?? 'Alasan tidak tersedia',
+                'revoked_by' => $certificate->revokedBy ? $certificate->revokedBy->name : 'Administrator'
+            ], 403);
+        }
 
         // Pastikan certificate_path tidak kosong
         if (empty($certificate->certificate_path)) {

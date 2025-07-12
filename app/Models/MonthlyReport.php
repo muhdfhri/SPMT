@@ -12,6 +12,21 @@ class MonthlyReport extends Model
 {
     use HasFactory;
 
+    // Status constants
+    public const STATUS_BELUM_TERISI = 'belum_terisi';
+    public const STATUS_SUBMITTED = 'submitted';
+    public const STATUS_PENDING = 'pending';
+    public const STATUS_APPROVED = 'approved';
+    public const STATUS_REJECTED = 'rejected';
+
+    public static $statuses = [
+        self::STATUS_BELUM_TERISI => 'Belum Terisi',
+        self::STATUS_SUBMITTED => 'Telah Dikirim',
+        self::STATUS_PENDING => 'Menunggu Review',
+        self::STATUS_APPROVED => 'Disetujui',
+        self::STATUS_REJECTED => 'Ditolak',
+    ];
+
     protected $fillable = [
         'user_id',
         'application_id',
@@ -27,16 +42,11 @@ class MonthlyReport extends Model
     ];
 
     protected $casts = [
-        'tasks' => 'array',
-        'achievements' => 'array',
-        'challenges' => 'array',
+        'tasks' => 'string',
+        'achievements' => 'string',
+        'challenges' => 'string',
         'reviewed_at' => 'datetime',
     ];
-
-    // Status constants
-    public const STATUS_PENDING = 'pending';
-    public const STATUS_APPROVED = 'approved';
-    public const STATUS_REJECTED = 'rejected';
 
     /**
      * Get the user that owns the monthly report.

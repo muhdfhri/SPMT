@@ -25,6 +25,9 @@
     <!-- Add this to ensure Tailwind is properly loaded -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
 
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
     <!-- Favicon -->
     <link rel="icon" href="{{ asset('images/webicon-spmt.jpg') }}" type="image/x-icon">
     <link rel="shortcut icon" href="{{ asset('images/webicon-spmt.jpg') }}" type="image/x-icon">
@@ -238,20 +241,33 @@
             const mobileMenuButton = document.getElementById('mobile-menu-button');
             const mobileMenu = document.getElementById('mobile-menu');
             const mobileMenuBackdrop = document.getElementById('mobile-menu-backdrop');
+            const mobileMenuClose = document.getElementById('mobile-menu-close');
 
-            if (mobileMenuButton) {
-                mobileMenuButton.addEventListener('click', function() {
-                    mobileMenu.classList.toggle('hidden');
-                    document.body.style.overflow = mobileMenu.classList.contains('hidden') ? '' : 'hidden';
-                });
+            // Function to close mobile menu
+            function closeMobileMenu() {
+                mobileMenu.classList.add('hidden');
+                document.body.style.overflow = '';
             }
 
+            // Function to open mobile menu
+            function openMobileMenu() {
+                mobileMenu.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            }
 
+            // Toggle mobile menu
+            if (mobileMenuButton) {
+                mobileMenuButton.addEventListener('click', openMobileMenu);
+            }
+
+            // Close mobile menu when clicking close button
+            if (mobileMenuClose) {
+                mobileMenuClose.addEventListener('click', closeMobileMenu);
+            }
+
+            // Close mobile menu when clicking on backdrop
             if (mobileMenuBackdrop) {
-                mobileMenuBackdrop.addEventListener('click', function() {
-                    mobileMenu.classList.add('hidden');
-                    document.body.style.overflow = '';
-                });
+                mobileMenuBackdrop.addEventListener('click', closeMobileMenu);
             }
 
             // Close mobile menu when clicking on a link
