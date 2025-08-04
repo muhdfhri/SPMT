@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\InternshipController;
@@ -27,6 +28,10 @@ use App\Http\Controllers\LandingPageController;
 use App\Http\Controllers\DivisionController;
 use App\Http\Controllers\AboutController;
 use App\Http\Controllers\NotificationController;
+
+// Google OAuth Routes
+Route::get('/auth/google', [GoogleController::class, 'redirectToGoogle'])->name('auth.google');
+Route::get('/auth/google/callback', [GoogleController::class, 'handleGoogleCallback']);
 
 Route::get('/', [LandingPageController::class, 'index'])->name('landing.page');
 

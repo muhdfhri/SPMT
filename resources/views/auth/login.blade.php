@@ -130,6 +130,25 @@
                             {{ __('Masuk') }}
                         </span>
                     </button>
+
+                    <!-- Divider with text -->
+                    <div class="relative my-6">
+                        <div class="absolute inset-0 flex items-center">
+                            <div class="w-full border-t border-gray-300 dark:border-gray-600"></div>
+                        </div>
+                        <div class="relative flex justify-center text-sm">
+                            <span class="px-2 bg-white dark:bg-gray-900 text-gray-500 dark:text-gray-400">
+                                Atau lanjutkan dengan
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Google Login Button -->
+                    <a href="{{ route('auth.google') }}" 
+                       class="w-full flex items-center justify-center px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-gray-900 transition-colors duration-200">
+                        <img src="https://www.google.com/favicon.ico" alt="Google" class="h-5 w-5 mr-2">
+                        <span>Masuk dengan Google</span>
+                    </a>
                 </form>
 
                 <!-- Register link -->

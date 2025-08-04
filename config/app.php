@@ -43,6 +43,7 @@ return [
         Spatie\Permission\PermissionServiceProvider::class,
         Spatie\Activitylog\ActivitylogServiceProvider::class,
         Barryvdh\DomPDF\ServiceProvider::class,
+        Laravel\Socialite\SocialiteServiceProvider::class,
 
         // Application Service Providers...
         App\Providers\AppServiceProvider::class,
@@ -50,6 +51,7 @@ return [
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
+        App\Providers\SocialiteServiceProvider::class,
     ],
 
     /*
@@ -104,6 +106,7 @@ return [
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
         'PDF' => Barryvdh\DomPDF\Facade\Pdf::class,
+        'Socialite' => Laravel\Socialite\Facades\Socialite::class,
     ],
 
     /*
